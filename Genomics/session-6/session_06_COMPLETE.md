@@ -1,0 +1,49 @@
+# Session 6: Transfer Learning for Genomics
+**Book Ref**: Deep Learning PyTorch Ch. 10, Gen AI Ch. 11.5 | **Duration**: 2-3 hours
+
+## Core Functions
+```python
+torch.save(model.state_dict(), 'model.pth')
+model.load_state_dict(torch.load('model.pth'))
+for param in model.parameters(): param.requires_grad = False
+```
+
+## Exercise 1: Fine-tuning Pre-trained Model
+```python
+# Load pre-trained model
+pretrained_model = torch.load('pretrained_human.pth')
+
+# Freeze early layers
+for param in pretrained_model.conv1.parameters():
+    param.requires_grad = False
+
+# Add new classifier
+pretrained_model.fc = nn.Linear(512, 10)  # New task
+
+# Train only new layers
+optimizer = torch.optim.Adam(
+    filter(lambda p: p.requires_grad, pretrained_model.parameters()),
+    lr=0.001
+)
+```
+
+## Exercise 2: Domain Adaptation
+```python
+class AdaptedModel(nn.Module):
+    def __init__(self, base_model):
+        super().__init__()
+        self.features = base_model.features  # Frozen
+        self.adapter = nn.Sequential(
+            nn.Linear(512, 256),
+            nn.ReLU(),
+            nn.Dropout(0.3),
+            nn.Linear(256, num_classes)
+        )
+    
+    def forward(self, x):
+        with torch.no_grad():
+            features = self.features(x)
+        return self.adapter(features)
+```
+
+*Multi-organism transfer learning examples included*
