@@ -41,10 +41,16 @@ def parse_markdown_to_notebook(md_content):
                     text = text[:-6].strip()
 
                 if text:
+                    # Split into lines and add newline to all but the last line
+                    lines = text.split('\n')
+                    source = [line + '\n' for line in lines[:-1]]
+                    if lines[-1]:  # Add last line without newline if not empty
+                        source.append(lines[-1])
+
                     cells.append({
                         "cell_type": "markdown",
                         "metadata": {},
-                        "source": text.split('\n')
+                        "source": source
                     })
         else:
             # This is a code block
@@ -57,12 +63,18 @@ def parse_markdown_to_notebook(md_content):
                 code = code[6:].lstrip()
 
             if code:
+                # Split into lines and add newline to all but the last line
+                lines = code.split('\n')
+                source = [line + '\n' for line in lines[:-1]]
+                if lines[-1]:  # Add last line without newline if not empty
+                    source.append(lines[-1])
+
                 cells.append({
                     "cell_type": "code",
                     "execution_count": None,
                     "metadata": {},
                     "outputs": [],
-                    "source": code.split('\n')
+                    "source": source
                 })
 
         i += 1
